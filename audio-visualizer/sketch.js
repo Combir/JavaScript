@@ -33,7 +33,7 @@ function setup() {
     }
 
     for (let i = 0; i < 300; i++) {
-        particles.push(new Particle());
+        particles.push(createParticle());
     }
 
     console.log("Setup complete");
@@ -44,10 +44,10 @@ function draw() {
 
     if (!isLoaded) {
         fill(255);
-        text("Loading sound...", width/2, height/2);
+        text("Loading sound...", width / 2, height / 2);
     } else if (!isInitialised || !sound.isPlaying()) {
         fill(255);
-        text("Press any key to play sound", width/2, height/2);
+        text("Press any key to play sound", width / 2, height / 2);
     } else {
         try {
             let spectrum = fft.analyze();
@@ -57,7 +57,7 @@ function draw() {
         } catch (error) {
             console.error("Error in draw function:", error);
             fill(255);
-            text("Error occurred. Check console.", width/2, height/2);
+            text("Error occurred. Check console.", width / 2, height / 2);
         }
     }
 }
@@ -79,15 +79,15 @@ function drawBackground() {
     let trebleEnergy = fft.getEnergy("treble");
 
     for (let i = particles.length - 1; i >= 0; i--) {
-        particles[i].update(bassEnergy);
-        particles[i].draw();
-        if (particles[i].isDead()) {
+        updateParticle(particles[i], bassEnergy);
+        drawParticle(particles[i]);
+        if (particles[i].lifespan < 0) {
             particles.splice(i, 1);
         }
     }
 
     if (random(1) < map(trebleEnergy, 0, 255, 0, 0.5) && particles.length < maxParticles) {
-        particles.push(new Particle());
+        particles.push(createParticle());
     }
 }
 
@@ -96,7 +96,7 @@ function drawVisualizer() {
     noStroke();
 
     for (let i = 0; i < smoothedSpectrum.length; i++) {
-        let barHeight = map(smoothedSpectrum[i], 0, 255, 0, height/2);
+        let barHeight = map(smoothedSpectrum[i], 0, 255, 0, height / 2);
         let hue = map(i, 0, smoothedSpectrum.length, 0, 360);
         fill(hue, 80, 100, 0.7);
         rect(i * barWidth, height - barHeight, barWidth, barHeight);
@@ -125,35 +125,34 @@ function keyPressed() {
     }
 }
 
-class Particle {
-    constructor() {
-        this.pos = createVector(random(width), random(height));
-        this.vel = createVector(random(-1, 1), random(-1, 1));
-        this.size = random(2, 6);
-        this.color = color(random(360), 80, 100, 0.6);
-        this.lifespan = 200;
-    }
+// Функция для создания частицы
+function createParticle() {
+    return {
+        pos: createVector(random(width), random(height)),
+        vel: createVector(random(-1, 1), random(-1, 1)),
+        size: random(2, 6),
+        color: color(random(360), 80, 100, 0.6),
+        lifespan: 200
+    };
+}
 
-    update(energy) {
-        this.vel.mult(1.01 + energy/1000);
-        this.pos.add(this.vel);
-        this.lifespan -= 1.5;
+// Функция для обновления частицы
+function updateParticle(particle, energy) {
+    particle.vel.mult(1.01 + energy / 1000);
+    particle.pos.add(particle.vel);
+    particle.lifespan -= 1.5;
 
-        if (this.pos.x < 0 || this.pos.x > width) this.vel.x *= -1;
-        if (this.pos.y < 0 || this.pos.y > height) this.vel.y *= -1;
-    }
+    if (particle.pos.x < 0 || particle.pos.x > width) particle.vel.x *= -1;
+    if (particle.pos.y < 0 || particle.pos.y > height) particle.vel.y *= -1;
+}
 
-    draw() {
-        noStroke();
-        let fadeAlpha = map(this.lifespan, 0, 200, 0, 0.6);
-        let particleColor = color(hue(this.color), saturation(this.color), brightness(this.color), fadeAlpha);
-        fill(particleColor);
-        ellipse(this.pos.x, this.pos.y, this.size);
-    }
-
-    isDead() {
-        return this.lifespan < 0;
-    }
+// Функция для рисования частицы
+function drawParticle(particle) {
+    noStroke();
+    let fadeAlpha = map(particle.lifespan, 0, 200, 0, 0.6);
+    let particleColor = color(hue(particle.color), saturation(particle.color), brightness(particle.color), fadeAlpha);
+    fill(particleColor);
+    ellipse(particle.pos.x, particle.pos.y, particle.size);
 }
 
 function windowResized() {
