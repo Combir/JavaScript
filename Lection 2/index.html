@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head> <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Styling with Plain JavaScript</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <div id="contentBox">
+      <p>This is a sample text box. Use the buttons below to change its style!</p>
+    </div>
+    <div class="button-container">
+      <button class="btn" onclick="changeTextAlign('left')">Align Left</button>
+      <button class="btn" onclick="changeTextAlign('center')">Align Center</button>
+      <button class="btn" onclick="changeTextAlign('right')">Align Right</button>
+
+      <button class="btn" onclick="changeBackgroundColor('#e0f7fa')">Light Blue</button>
+      <button class="btn" onclick="changeBackgroundColor('#ffeb3b')">Yellow</button>
+      <button class="btn" onclick="changeBackgroundColor('#f8bbd0')">Pink</button>
+
+      <button class="btn" onclick="changeTextColor('#333')">Dark</button>
+      <button class="btn" onclick="changeTextColor('#00796b')">Green</button>
+      <button class="btn" onclick="changeTextColor('#d32f2f')">Red</button>
+
+      <button class="btn" onclick="changeFontSize('16px')">Small</button>
+      <button class="btn" onclick="changeFontSize('20px')">Medium</button>
+      <button class="btn" onclick="changeFontSize('24px')">Large</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+
