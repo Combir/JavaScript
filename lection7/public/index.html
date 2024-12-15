@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advanced Drawing App</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.js"></script>
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    #controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 10px;
+      justify-content: center;
+    }
+    button, select, input {
+      margin: 5px;
+      padding: 5px;
+    }
+  </style>
+</head>
+<body>
+<div id="controls">
+  <label for="toolSelect">Drawing Tool:</label>
+  <select id="toolSelect">
+    <option value="pen">Pen</option>
+    <option value="line">Line</option>
+    <option value="rectangle">Rectangle</option>
+    <option value="circle">Circle</option>
+  </select>
+  <label for="thicknessSlider">Brush Thickness:</label>
+  <input type="range" id="thicknessSlider" min="1" max="50" value="5">
+  <label for="colorPicker">Color:</label>
+  <input type="color" id="colorPicker" value="#000000">
+  <button id="clearCanvas">Clear Canvas</button>
+  <button id="saveDrawing">Save Drawing</button>
+</div>
+<script>
+  let currentTool = 'pen';
+  let brushThickness = 5;
+  let brushColor = '#000000';
+  let startX, startY;
+
+  function setup() {
+    const canvas = createCanvas(windowWidth, windowHeight - 100);
+    background(255);
+
+    const toolSelect = document.getElementById('toolSelect');
+    const thicknessSlider = document.getElementById('thicknessSlider');
+    const colorPicker = document.getElementById('colorPicker');
+    const clearButton = document.getElementById('clearCanvas');
+    const saveButton = document.getElementById('saveDrawing');
+
+    toolSelect.addEventListener('change', () => {
+      currentTool = toolSelect.value;
+    });
+
+    thicknessSlider.addEventListener('input', () => {
+      brushThickness = parseInt(thicknessSlider.value);
+    });
+
+    colorPicker.addEventListener('input', () => {
+      brushColor = colorPicker.value;
+    });
+
+    clearButton.addEventListener('click', () => {
+      background(255);
+    });
+    clearButton.addEventListener('mouseover', () => {
+      clearButton.style.backgroundColor = '#ffcccc';
+    });
+    clearButton.addEventListener('mouseout', () => {
+      clearButton.style.backgroundColor = '';
+    });
+
+    saveButton.addEventListener('click', () => {
+      saveCanvas('myDrawing', 'png');
+    });
+
+    saveButton.addEventListener('dblclick', () => {
+      alert('Double-clicked Save! Your drawing will be saved as a PNG file.');
+    });
+  }
+
+  function draw() {
+    if (currentTool === 'pen' && mouseIsPressed) {
+      stroke(brushColor);
+      strokeWeight(brushThickness);
+      line(mouseX, mouseY, pmouseX, pmouseY);
+    }
+  }
+
+  function mousePressed() {
+    startX = mouseX;
+    startY = mouseY;
+  }
+
+  function mouseReleased() {
+    if (currentTool !== 'pen') {
+      stroke(brushColor);
+      strokeWeight(brushThickness);
+      noFill();
+
+      switch (currentTool) {
+        case 'line':
+          line(startX, startY, mouseX, mouseY);
+          break;
+        case 'rectangle':
+          rectMode(CORNERS);
+          rect(startX, startY, mouseX, mouseY);
+          break;
+        case 'circle':
+          const diameter = dist(startX, startY, mouseX, mouseY);
+          ellipseMode(CENTER);
+          ellipse(startX, startY, diameter);
+          break;
+      }
+    }
+  }
+
+  function windowResized() {
+    resizeCanvas(windowWidth, windowHeight - 100);
+    background(255);
+  }
+</script>
+</body>
+</html>
